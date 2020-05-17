@@ -5,6 +5,7 @@ PATH = "/home/abde/URV/VC/prac/Florida (a processar)/";
 
 image = imread(PATH + "074YDR.jpg");
 % image = imread(PATH + "112TBC.jpg");
+real_image = image;
 
 
 %==> PREPROCESAMIENTO 
@@ -18,8 +19,9 @@ image = medfilt2(image, [5 5]);
 
 
 %==> SEGMENTACION
-image = AumentarMatricula(image); 
-orig = image;
+corte = AumentarZonaMatricula(image); 
+real_image = imcrop(real_image, corte);
+image = imcrop(image, corte);
 
 
 
@@ -62,22 +64,32 @@ stats=regionprops(Etiquetas,'all');
 areaMaxima=sort([stats.Area],'descend');
 indiceLogo=find([stats.Area]==areaMaxima(1) ); % Coloca en orden de mayor a menor las áreas de la imagen
 
-for i=1:size(indiceLogo,2)
-rectangle('Position',stats(indiceLogo(i)).BoundingBox,'EdgeColor','r','LineWidth',3);
-E = stats(indiceLogo(i)).BoundingBox;
+
+for i = 1:size(indiceLogo,2)
+    % Dibujar rectangulo 
+    % rectangle('Position',stats(indiceLogo(i)).BoundingBox,'EdgeColor','r','LineWidth',3);
+    
+    % Obtenemos todas las esquinas
+    corner_plate = stats(indiceLogo(i)).BoundingBox;
 end
 
 
-X=E.*[1 0 0 0]; X=max(X); %Determina eje X esquina superior Izq. Placa
-Y=E.*[0 1 0 0]; Y=max(Y); %Determina eje Y esquina superior Der. Placa
-W=E.*[0 0 1 0]; W=max(W); %Determina Ancho Placa
-H=E.*[0 0 0 1]; H=max(H); %Determina Altura placa
-Corte=[X Y (W-2) (H-7)]; %Determina coordenadas de corte
-IMF=imcrop(orig,Corte);
-I1 = orig(:,:,1);
-[M,N] = size(IMF);
-
-figure, imshow(IMF);
-%figure; imagesc(IMF);colormap gray; axis equal;
+X = corner_plate(1);
+Y = corner_plate(2);
+W = corner_plate(3);
+H = corner_plate(4);
 
 
+corte = [X Y (W-2) (H-7)]; %Determina coordenadas de corte
+
+plate_image = imcrop(real_image, corte);
+
+% I1 = plate_image(:,:,1);
+% [M,N] = size(IMF);
+
+% figure, imshow(plate_image);
+% figure; imagesc(IMF);colormap gray; axis equal;
+
+plate_text = getPlateText(plate_image);
+
+plate_text

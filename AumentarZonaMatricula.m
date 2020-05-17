@@ -1,6 +1,6 @@
 
 
-function [result_image] = AumentarMatricula(image)
+function [result] = AumentarZonaMatricula(image)
     
     % Aplicamos el algoritmo de canny para obtener los bordes
     %   > Con esto conseguimos remarcar la zona donde "es posible" que se
@@ -49,6 +49,8 @@ function [result_image] = AumentarMatricula(image)
     Hindex = fila + 80;
     
     % A partir de la fila con mayor discontinuidad, recortamos la imagen 
-    Corte = [0 Lindex Y Hindex]; % Determina coordenadas de corte
-    result_image = imcrop(image, Corte);
+    corte = [0 Lindex Y Hindex]; % Determina coordenadas de corte
+    
+    result = corte;
+    % result = imcrop(image, corte);
 end
