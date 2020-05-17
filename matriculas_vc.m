@@ -3,7 +3,9 @@ close all
 clc
 
 PATH = "/media/david/729A72279A71E84D/Users/David/Desktop/Enginyeria-Informatica/VC/practiques/Imatges matricules/";
-image = uint16(imread(PATH + "Imatge1-blau.jpg"));
+image = uint16(imread(PATH + "Imatge1-rosa.jpg"));
+
+
 
 % Segmentamos la matricula.
 segmented = segment(image);
@@ -19,7 +21,7 @@ figure, imshowpair(uint8(image), segmented, 'montage');
 X = props;
 Y = class;
 % Entrena a un clasificador de vecinos 3 más cercanos.
-Mdl = fitcknn(X,Y,'NumNeighbors',3);
+Mdl = fitcknn(X,Y,'NumNeighbors', 4);
 
 % Llamamos a la funcion para detectar cada caracter de la matricula
 plate_text = detect(Mdl, number_plate);
@@ -84,14 +86,14 @@ end
 % Función para segmentar los caracteres de la matricula.
 function I2 = segment(I)
     % Creamos un filtro gaussiano y filtramos la imagen para suabizarla 
-    gauss = fspecial('gaussian', 5);
+    gauss = fspecial('gaussian', 10);
     filtered = imfilter(I, gauss);
     
     % Pasamos la imagen filtrada a el espacio de color HSV.
     hsv = rgb2hsv(filtered);
     [h,s,v] = imsplit(hsv); % Separamos matiz, saturación y valor.
-    mask = h >= 0.33 & h <= 0.5; % Filtramos por matiz verde.
-
+    mask = h >= 0.15 & h <= 0.37; % Filtramos por matiz verde.
+    
     % Erosionamos la imagen filtrada.
     se = strel('square', 2);
     eroded = imerode(mask, se);
