@@ -80,27 +80,25 @@ end
 
 % Función para segmentar los caracteres de la matricula.
 function I2 = segment(I)
-    % Creamos un filtro gaussiano y filtramos la imagen para suabizarla 
-    gauss = fspecial('gaussian', 5);
-    filtered = imfilter(I, gauss);
-    
-    % Pasamos la imagen filtrada a el espacio de color HSV.
-    hsv = rgb2hsv(filtered);
-    [h,s,v] = imsplit(hsv); % Separamos matiz, saturación y valor.
-    mask = h >= 0.33 & h <= 0.5; % Filtramos por matiz verde.
 
-    % Erosionamos la imagen filtrada.
-    se = strel('square', 2);
-    eroded = imerode(mask, se);
+    % Dilatamos la imagen resultante.
+    se2 = strel('disk', 1);
+    eroded = imerode(I, se2);
+    
+    h = fspecial('gaussian',4);
+    %dilated = imfilter(dilated,h);
+    
+    imgray = rgb2gray(eroded);
+    
+    J = adaptthresh(imgray,'Statistic','gaussian', 'ForegroundPolarity', 'dark');
+    bw =~ imbinarize(imgray, J);
+    
+    
     
     % Eliminamos las regiones menores a 200 pixeles.
-    cleaned = bwareaopen(eroded, 200);
+    bw = bwareaopen(bw, 200);
     
-    % Dilatamos la imagen resultante.
-    se2 = strel('square', 3);
-    dilated = imdilate(cleaned, se2);
-    
-    I2 = dilated;
+    I2 = bw;
 end
 
 % Función para recortar los caracteres de la matricula y guardarlos en un

@@ -2,11 +2,16 @@ clear all
 close all
 clc
 
-PATH = "/media/david/729A72279A71E84D/Users/David/Desktop/Enginyeria-Informatica/VC/practiques/Imatges matricules/";
-image = uint16(imread(PATH + "Imatge1-blau.jpg"));
+% PATH = "/media/david/729A72279A71E84D/Users/David/Desktop/Enginyeria-Informatica/VC/practiques/Imatges matricules/";
+% image = uint16(imread(PATH + "Imatge1-blau.jpg"));
+PATH = "Florida (a processar)/"
+image = imread(PATH + "112TBC.jpg");
+
+Corte = [630 250 200 100]; % Determina coordenadas de corte
+image = imcrop(image, Corte);
 
 % Segmentamos la matricula.
-segmented = segment(image);
+segmented = segment2(image);
 
 % Cortamos cada caracter de la matricula y lo guardamos en un array.
 number_plate = crop(segmented);
@@ -80,6 +85,41 @@ function [props, class] = load_properties(models)
     end
 end
 
+function I2 = segment2(I)
+
+    imgray = imcomplement(rgb2gray(I));
+
+    imgray = imgray + imgray + imgray;
+    
+    h = fspecial('average',1);
+    imgray = imfilter(imgray,h);
+    
+    %maxim = max(imgray(:));
+    %minim = min(imgray(:));
+
+    %norm1 = arrayfun(@(p) (p-minim) / (maxim-minim) * 255, imgray);
+    
+    
+    bw =imadjust(imgray,stretchlim(imgray),[]);
+    
+    bw = edge(bw,'canny');
+
+    bw = imcomplement(bw);
+    
+
+   
+    %bw = bwareaopen(imcomplement(bw), 50);
+    
+    imshow(bw);
+    
+    
+    
+    %edged = edge(histeq(filtered), 'canny');
+
+
+    %filled = imfill(bw,'holes');
+
+end
 
 % Función para segmentar los caracteres de la matricula.
 function I2 = segment(I)
