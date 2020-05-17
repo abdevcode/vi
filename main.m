@@ -3,8 +3,8 @@ close all
 
 PATH = "Florida (a processar)/";
 
-%image = imread(PATH + "074YDR.jpg");
-image = imread(PATH + "112TBC.jpg");
+image = imread(PATH + "074YDR.jpg");
+%image = imread(PATH + "112TBC.jpg");
 real_image = image;
 
 

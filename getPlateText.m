@@ -82,7 +82,7 @@ end
 function I2 = segment(I)
 
     % Dilatamos la imagen resultante.
-    se2 = strel('disk', 1);
+    se2 = strel('square', 2);
     eroded = imerode(I, se2);
     
     h = fspecial('gaussian',4);
@@ -99,6 +99,10 @@ function I2 = segment(I)
     bw = bwareaopen(bw, 200);
     
     I2 = bw;
+end
+
+function cleaned = clean_plate(I)
+    
 end
 
 % Función para recortar los caracteres de la matricula y guardarlos en un
