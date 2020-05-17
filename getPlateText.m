@@ -80,6 +80,148 @@ end
 
 % Función para segmentar los caracteres de la matricula.
 function I2 = segment(I)
+    I2 = I;
+    
+    figure, imshow(I);
+    
+    
+    
+    
+    
+    image = medfilt3(I, [3 3 3]);
+    figure, imshow(image);
+    
+    image = histeq(image, 10);
+    figure, imhist(image);
+    
+    figure, imshow(image);
+    
+    
+    redChannel = image(:, :, 1);
+    greenChannel = image(:, :, 2);
+    blueChannel = image(:, :, 3);
+
+    %figure, imshow(redChannel);
+    %figure, imshow(greenChannel);
+    %figure, imshow(blueChannel);
+    
+
+ %{
+    
+    
+   [h s v] = rgb2hsv(I);
+    
+    %figure, imshow(s);
+    %figure, imshow(v);
+    
+    %redChannel = I(:, :, 1);
+    greenChannel = I(:, :, 2);
+    %blueChannel = I(:, :, 3);
+
+    greenChannel = medfilt2(greenChannel, [3 3]);
+    
+    greenChannel = histeq(greenChannel, 5);
+    %imhist(greenChannel)
+    
+    %dualchannel = redChannel + blueChannel;
+    %figure, imshow(redChannel);
+    %figure, imshow(greenChannel);
+    %figure, imshow(blueChannel);
+    
+    
+    %
+    
+    figure, imshow(greenChannel);
+    
+    % SE = strel('line',len,deg)
+    %se = strel('disk', 5); 
+    %greenChannel = imdilate(greenChannel, se);
+    %figure, imshow(greenChannel);
+    
+    
+    thresh = multithresh(greenChannel, 1);
+    seg_I = imquantize(greenChannel, thresh);
+    RGB = label2rgb(seg_I);
+    
+    %RGB = bwareaopen(RGB, 90);
+    
+    figure, imshow(RGB);
+    
+    % bws = bwareaopen(bwv, 90);
+    %rc =~ imbinarize(redChannel, 0.7);
+    %gc =~ imbinarize(greenChannel, 0.7);
+    %bc =~ imbinarize(blueChannel, 0.7);
+    
+    
+%     gc = bwareaopen(gc, 500);
+%     
+%     figure, imshow(rc);
+%     figure, imshow(gc);
+%     figure, imshow(bc);
+    
+    thresh = multithresh(I, 7);
+    seg_I = imquantize(I, thresh);
+    RGB = label2rgb(seg_I);
+    
+    %level = graythresh(greenChannel)
+    
+    %seg_I = imquantize(greenChannel, level);
+    
+    %RGB = label2rgb(seg_I);
+    
+    %figure, imshow(RGB);
+    
+   
+    % Convert to gray scale 
+    yy = rgb2gray(I); 
+    % axes(handles.axes2); 
+    imshow(yy); title('CONVERSION TO GRAYSCALE');
+    
+    
+    % median filter 
+    nr=medfilt2(yy,[3 3]); 
+    axes(handles.axes3); 
+    imshow(nr); title('NOISE REMOVAL');
+    
+    % Image Dilation 
+    se=strel('disk',1); 
+    id=imdilate(nr,se); 
+    axes(handles.axes4); 
+    imshow(id); title('IMAGE DILATION');
+    
+    % Image Erosion 
+    ie=imerode(id,se); 
+    axes(handles.axes5); 
+    imshow(ie); title('IMAGE EROSION');
+    
+    % Convert to BW 
+    level = graythresh(ie); 
+    bw = im2bw(ie, level); 
+    axes(handles.axes6); 
+    imshow(bw); title('CONVERSION TO BINARY');
+    
+    % Image Complement 
+    ic =~bw; 
+    axes(handles.axes7); 
+    imshow(ic); title('PLATE COMPLEMENT');
+    
+    % Remove all object containing fewer than 300 pixels 
+    rp = bwareaopen(ic,300); 
+    axes(handles.axes8); 
+    imshow(rp); title('PIXEL REMOVAL <300');
+    
+    % Selecting all the regions that are of pixel area more than 600 
+    final=bwareaopen(rp,600); 
+    axes(handles.axes9); 
+    imshow(final); title('PIXEL SELECTION >600');
+
+    
+    
+    
+    
+    
+    
+    
 
     % Dilatamos la imagen resultante.
     se2 = strel('disk', 1);
@@ -99,6 +241,9 @@ function I2 = segment(I)
     bw = bwareaopen(bw, 200);
     
     I2 = bw;
+    
+    %}
+    
 end
 
 % Función para recortar los caracteres de la matricula y guardarlos en un
