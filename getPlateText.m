@@ -1,27 +1,37 @@
-function plateText = getPlateText(image)
+function [plateText, segmentedPlate] = getPlateText(image, mdl)
     % Segmentamos la matricula.
     segmented = segment(image);
 
     % Cortamos cada caracter de la matricula y lo guardamos en un array.
     number_plate = crop(segmented);
+    
+    cleaned = clean_plate(number_plate);
 
     % Mostramos la imagen segmentada.
-    figure, imshowpair(uint8(image), segmented, 'montage');
-
-    [props, class] = load_models("matriculas", 11);
-
-    X = props;
-    Y = class;
-    % Entrena a un clasificador de vecinos 3 más cercanos.
-    Mdl = fitcknn(X,Y,'NumNeighbors', 4);
-
+    %figure, imshowpair(uint8(image), segmented, 'montage');
+        
     % Llamamos a la funcion para detectar cada caracter de la matricula
-    plate_text = detect(Mdl, number_plate);
+    plate_text = detect(mdl, cleaned);
 
+    
+    
     % Mostramos el resultado por el terminal.
     %disp(string(plate_text));
-    plateText = string(plate_text);
+    %plateText = string(plate_text);
+    
+    [f c]= size(convertStringsToChars(plate_text));
+    
+    % Si no detecta los 6 caracteres rellenamos con 0 al prinicpio
+    if(c < 6)
+        complete_text = "";
+        for i = 1 : 6-c
+            plate_text=append(plate_text,"0");
+        end
+    end
+    plateText = convertStringsToChars(plate_text);
 end
+
+
 
 
 % Función que a partir de una imagen detecta el caracter que le
@@ -36,26 +46,7 @@ function result = detect(model, plate)
     end
 end
 
-function [props, class] = load_models(folder, num_models)
-    I = imread(folder + "/fuente"+1+"_matricula.png"); % Leemos la imagen.
-    % Binarizamos la imagen y obtenemos su complementaria.
-    bw = imcomplement(imbinarize(rgb2gray(I)));
-    % Recortamos cada caracter de la imagen y los guardamos en un array
-    % ademas cargamos todas las propiedades y sus clases en dos matrices.
-    [props, class] = load_properties(crop(bw));
-    
-    for i = 2 : num_models
-        I = imread(folder + "/fuente"+i+"_matricula.png"); % Leemos la imagen.
-        % Binarizamos la imagen y obtenemos su complementaria.
-        bw = imcomplement(imbinarize(rgb2gray(I)));
-        % Recortamos cada caracter de la imagen y los guardamos en un array
-        % ademas cargamos todas las propiedades y sus clases en dos matrices.
-        [p, c] = load_properties(crop(bw));
-        props = [props ; p];
-        class = [class ; c];
-    end
-    
-end
+
 
 % Funcion para cargar las letras que serviran de modelo.
 function [props, class] = load_properties(models)
@@ -81,7 +72,7 @@ end
 % Función para segmentar los caracteres de la matricula.
 function I2 = segment(I)
 
-    % Dilatamos la imagen resultante.
+% Dilatamos la imagen resultante.
     se2 = strel('square', 2);
     eroded = imerode(I, se2);
     
@@ -99,10 +90,45 @@ function I2 = segment(I)
     bw = bwareaopen(bw, 200);
     
     I2 = bw;
+
+
+% 
+%     im_r = I(:, :, 1);
+%     im_g = I(:, :, 2);
+%     im_b = I(:, :, 3);
+%     
+%     I = im_g + im_b - im_r;
+%     
+%     
+%     J = adaptthresh(I,'Statistic','gaussian', 'ForegroundPolarity', 'dark');
+%     bw = imbinarize(I, J);
+%     
+%     se = strel('square', 3);
+%     
+%     bw = imerode(bw, se);
+%     
+%     bw = bwareaopen(bw, 100);
+%     
+%     %imshow(bw);
+%     
+%     I2 = bw;
 end
 
-function cleaned = clean_plate(I)
+function cleaned = clean_plate(segmented)
+    cleaned = cell(6);
     
+    [f c] = size(segmented);
+    if(f == 7)
+        cleaned{1} = segmented{1};
+        cleaned{2} = segmented{2};
+        cleaned{3} = segmented{3};
+        cleaned{4} = segmented{5};
+        cleaned{5} = segmented{6};
+        cleaned{6} = segmented{7};
+
+    else
+       cleaned = segmented;
+    end
 end
 
 % Función para recortar los caracteres de la matricula y guardarlos en un
@@ -114,7 +140,7 @@ function words_array = crop(I)
     for i = 1: numel(regions)
         % Recortamos el caracter segun su BoundingBox i cambiamos su tamaño
         % por uno fijo.
-        words_array{i} = imresize(imcrop(I,regions(i).BoundingBox), [52, 42]);
+        words_array{i} = imresize(imcrop(I,regions(i).BoundingBox), [42, 32]);
     end
 end
 

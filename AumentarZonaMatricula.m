@@ -44,7 +44,7 @@ function [result] = AumentarZonaMatricula(image)
     
     % La funcion max nos devuelve el maximo y la fila donde se encuentra
     % ese maximo
-    [M, fila] = max(B)
+    [M, fila] = max(B);
     Lindex = fila - 80;
     Hindex = fila + 80;
     

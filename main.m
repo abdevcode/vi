@@ -1,76 +1,50 @@
 clear all
 close all
+clc
 
-PATH = "/home/abde/Escritorio/git-vi/vi/Florida (a processar)/";
-
-<<<<<<< HEAD
-image = imread(PATH + "074YDR.jpg");
-%image = imread(PATH + "112TBC.jpg");
-=======
-%image = imread(PATH + "074YDR.jpg");
-%image = imread(PATH + "112TBC.jpg");
-%image = imread(PATH + "103XUF.jpg");
-image = imread(PATH + "423XWS.jpg");
+PATH = "Florida (a processar)/";
 
 
+mdl = trainKnn();
 
->>>>>>> 79d9a9252e81bd269cbb702241d4c9f823dc2634
-real_image = image;
+array_correct = zeros(1, 7);
+files = dir(fullfile(PATH, '*.jpg')); % pattern to match filenames.
+for i = 1:numel(files)
+    file = fullfile(PATH, files(i).name);
+    
+    
+    
+    
+    image = imread(file);
+    %imshow(image)
 
-
-%==> PREPROCESAMIENTO 
-% Transformamos la imagen en escala de grises
-% Se pierde tono y saturacion pero se mantiene luminancia
-image = rgb2gray(image);
-
-% Usamos un filtro para el suavizado (en este caso la mediana)
-image = medfilt2(image, [5 5]);
-
-
-
-%==> SEGMENTACION
-corte = AumentarZonaMatricula(image); 
-real_image = imcrop(real_image, corte);
-image = imcrop(image, corte);
-
-
-% Aplicamos operacion morfologica de cierre en la imagen 
-se = strel('disk', 20);
-image = imclose(image, se);
-image = imopen(image, se);
-
-
-
-BW = imbinarize(image);
-
-%Crea regiones
-[Etiquetas, N]=bwlabel(BW);
-
-MAP = [0 0 0; jet(N)];
-I = ind2rgb(Etiquetas+1, MAP);
-
-
-stats=regionprops(Etiquetas,'all');
-areaMaxima=sort([stats.Area],'descend');
-indiceLogo=find([stats.Area]==areaMaxima(1) ); % Coloca en orden de mayor a menor las áreas de la imagen
-
-
-for i = 1:size(indiceLogo,2)
-    % Obtenemos todas las esquinas
-    corner_plate = stats(indiceLogo(i)).BoundingBox;
+    plate_image = getPlateImage(image);
+    
+    % imshow(plate_image)
+    plate_text = getPlateText(plate_image, mdl);
+    
+    plate_text_real = convertStringsToChars(files(i).name);
+    
+    
+    correct = 1;
+    % Recorremos todas las letras de la matricula
+    for k = 1:6
+        if plate_text_real(k) == plate_text(k)
+            correct = correct + 1;
+        end 
+    end
+    
+    array_correct(correct) = array_correct(correct) + 1;    
 end
 
 
-X = corner_plate(1);
-Y = corner_plate(2);
-W = corner_plate(3);
-H = corner_plate(4);
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(7)/numel(files))*100, 2)),' %) s’han reconegut tots els caracters de la matricula'] ); 
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(6)/numel(files))*100, 2)),' %) s’han reconegut 5 caracters de la matricula\n'] );
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(5)/numel(files))*100, 2)),' %) s’han reconegut 4 caracters de la matricula'] );
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(4)/numel(files))*100, 2)),' %) s’han reconegut 3 caracters de la matricula'] );
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(3)/numel(files))*100, 2)),' %) s’han reconegut 2 caracters de la matricula'] );
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(2)/numel(files))*100, 2)),' %) s’ha reconegut 1 caracter de la matricula'] );
+disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(1)/numel(files))*100, 2)),' %) no s’ha reconegut cap caracter'] );
 
+% A = imread('cameraman.tif'); B = imrotate(A,5,'bicubic','crop');
 
-corte = [(X+2) (Y+5) (W-4) (H-10)]; %Determina coordenadas de corte
-
-plate_image = imcrop(real_image, corte);
-
-plate_text = getPlateText(plate_image);
-
-plate_text
