@@ -2,25 +2,21 @@ clear all
 close all
 clc
 
-PATH = "Florida (a processar)/";
-
+PATH = "/home/abde/Escritorio/git-vi/vi/Florida (a processar)/";
 
 mdl = trainKnn();
 
 array_correct = zeros(1, 7);
 files = dir(fullfile(PATH, '*.jpg')); % pattern to match filenames.
+
 for i = 1:numel(files)
     file = fullfile(PATH, files(i).name);
     
-    
-    
-    
     image = imread(file);
-    %imshow(image)
 
     plate_image = getPlateImage(image);
+
     
-    % imshow(plate_image)
     plate_text = getPlateText(plate_image, mdl);
     
     plate_text_real = convertStringsToChars(files(i).name);
@@ -34,9 +30,9 @@ for i = 1:numel(files)
         end 
     end
     
-    array_correct(correct) = array_correct(correct) + 1;    
-end
+    array_correct(correct) = array_correct(correct) + 1;   
 
+end
 
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(7)/numel(files))*100, 2)),' %) s’han reconegut tots els caracters de la matricula'] ); 
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(6)/numel(files))*100, 2)),' %) s’han reconegut 5 caracters de la matricula\n'] );
@@ -46,5 +42,13 @@ disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(3
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(2)/numel(files))*100, 2)),' %) s’ha reconegut 1 caracter de la matricula'] );
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(1)/numel(files))*100, 2)),' %) no s’ha reconegut cap caracter'] );
 
-% A = imread('cameraman.tif'); B = imrotate(A,5,'bicubic','crop');
+
+%{
+i = 1;
+
+file = fullfile(PATH, files(i).name);
+image = imread(file);
+plate_image = getPlateImage(image);
+figure, imshowpair(image, plate_image, 'montage');
+%}
 

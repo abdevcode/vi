@@ -7,6 +7,10 @@ function [result] = AumentarZonaMatricula(image)
     %   encuentre la matricula
     image_edge = edge(image, 'canny', 0.5);
     
+    
+    figure, imshow(image_edge);
+    
+    
     % Obtenemos el tamaño de la imagen
     [X, Y] = size(image_edge);
     
