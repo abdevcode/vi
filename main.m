@@ -2,13 +2,16 @@ clear all
 close all
 clc
 
+pause on % to enable pause function
+
 PATH = "/home/abde/Escritorio/git-vi/vi/Florida (a processar)/";
 
-mdl = trainKnn();
+
+%mdl = trainKnn();
 
 array_correct = zeros(1, 7);
 files = dir(fullfile(PATH, '*.jpg')); % pattern to match filenames.
-
+%{
 for i = 1:numel(files)
     file = fullfile(PATH, files(i).name);
     
@@ -41,14 +44,18 @@ disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(4
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(3)/numel(files))*100, 2)),' %) s’han reconegut 2 caracters de la matricula'] );
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(2)/numel(files))*100, 2)),' %) s’ha reconegut 1 caracter de la matricula'] );
 disp( ['En ', num2str(numel(files)),' imatges (', num2str(round((array_correct(1)/numel(files))*100, 2)),' %) no s’ha reconegut cap caracter'] );
-
-
-%{
-i = 1;
-
-file = fullfile(PATH, files(i).name);
-image = imread(file);
-plate_image = getPlateImage(image);
-figure, imshowpair(image, plate_image, 'montage');
 %}
+
+
+for i = 1:numel(files)
+
+    file = fullfile(PATH, files(i).name);
+    image = imread(file);
+    plate_image = getPlateImage(image);
+    
+    imshowpair(image, plate_image, 'montage');
+
+    pause(1) %in seconds
+end
+
 
