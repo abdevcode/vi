@@ -3,8 +3,7 @@ close all
 clc
 
 PATH = "/media/david/729A72279A71E84D/Users/David/Desktop/Enginyeria-Informatica/VC/practiques/Imatges matricules/";
-image = uint16(imread(PATH + "Imatge1-rosa.jpg"));
-
+image = uint16(imread(PATH + "Imatge3-rosa.jpg"));
 
 
 % Segmentamos la matricula.
@@ -15,19 +14,24 @@ number_plate = crop(segmented);
 
 % Mostramos la imagen segmentada.
 figure, imshowpair(uint8(image), segmented, 'montage');
+%figure, imshow(segmented);
 
-[props, class] = load_models("matriculas", 11);
+[props, class] = load_models("matriculas", 32);
 
 X = props;
 Y = class;
 % Entrena a un clasificador de vecinos 3 más cercanos.
-Mdl = fitcknn(X,Y,'NumNeighbors', 4);
+Mdl = fitcknn(X,Y,'NumNeighbors', 3, 'Standardize', 0);
 
 % Llamamos a la funcion para detectar cada caracter de la matricula
 plate_text = detect(Mdl, number_plate);
 
 % Mostramos el resultado por el terminal.
 disp(string(plate_text));
+
+
+
+
 
 % Función que a partir de una imagen detecta el caracter que le
 % correpsonde.
@@ -117,7 +121,7 @@ function words_array = crop(I)
     for i = 1: numel(regions)
         % Recortamos el caracter segun su BoundingBox i cambiamos su tamaño
         % por uno fijo.
-        words_array{i} = imresize(imcrop(I,regions(i).BoundingBox), [52, 42]);
+        words_array{i} = imresize(imcrop(I,regions(i).BoundingBox), [42, 32]);
     end
 end
 
