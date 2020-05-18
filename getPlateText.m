@@ -34,7 +34,7 @@ end
 
 
 
-% Función que a partir de una imagen detecta el caracter que le
+% Funci贸n que a partir de una imagen detecta el caracter que le
 % correpsonde.
 function result = detect(model, plate)
     result = "";
@@ -69,7 +69,7 @@ function [props, class] = load_properties(models)
 end
 
 
-% Función para segmentar los caracteres de la matricula.
+% Funci贸n para segmentar los caracteres de la matricula.
 function I2 = segment(I)
 
 % Dilatamos la imagen resultante.
@@ -131,14 +131,14 @@ function cleaned = clean_plate(segmented)
     end
 end
 
-% Función para recortar los caracteres de la matricula y guardarlos en un
-% array, como imagenes de un tamaño fijo.
+% Funci贸n para recortar los caracteres de la matricula y guardarlos en un
+% array, como imagenes de un tama帽o fijo.
 function words_array = crop(I)
     % Obtenemos la propiedad boundingbox de cada region.
     regions = regionprops(I, 'boundingbox');
     words_array = cell(numel(regions)); % Inicializamos word_array.
     for i = 1: numel(regions)
-        % Recortamos el caracter segun su BoundingBox i cambiamos su tamaño
+        % Recortamos el caracter segun su BoundingBox i cambiamos su tama帽o
         % por uno fijo.
         words_array{i} = imresize(imcrop(I,regions(i).BoundingBox), [42, 32]);
     end
